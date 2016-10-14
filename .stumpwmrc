@@ -1,0 +1,34 @@
+(in-package :stumpwm)
+
+;;; snippet pulled from emacswiki w/ slight changes
+(require 'swank)
+(swank-loader:init)
+(defcommand swank () ()
+  (swank:create-server :port 4006 ;something other than the default
+		       :style swank:*communication-style*
+		       :dont-close t)
+  (echo-string (current-screen) 
+	       "Starting swank. M-x slime-connect RET RET, then (in-package :stumpwm)."))
+;;; end snippet
+
+(set-prefix-key (kbd "s-t"))
+
+(mapcar #'run-shell-command '("stalonetray"
+                              "xfce4-power-manager"
+                              "xscreensaver -no-splash"
+                              "udiskie"
+                              "xsetroot -solid black"))
+
+(setf *time-modeline-string* "^B%a %b %e^b ^6*%k:%M:%S^n"
+      *screen-mode-line-format* (list "[^B%n^b] %W ^> [%d]")
+      *mode-line-timeout* 1))
+
+(dolist (screen *screen-list*)
+  (toggle-mode-line screen (current-head)))
+
+(define-key *top-map* (kbd "XF86AudioLowerVolume") "exec amixer -q sset Master 5%-")
+(define-key *top-map* (kbd "XF86AudioRaiseVolume") "exec amixer -q sset Master 5%+")
+(define-key *top-map* (kbd "XF86AudioMute") "exec amixer -q sset Master 0%")
+(define-key *top-map* (kbd "s-TAB") "windowlist")
+
+(define-key *root-map* (kbd "M-f") "exec pcmanfm")
